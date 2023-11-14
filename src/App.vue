@@ -6,7 +6,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
   <header>
     <div class="navbar">
-      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+      <img alt="Guru logo" class="logo" src="@/assets/OIG-removebg-preview.png" width="175" height="175" />
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
@@ -33,6 +33,7 @@ header {
   padding: 1rem;
   background-color: #3498db; /* You can change the background color as needed */
   width: 100%; /* Ensure the navbar spans the width of the page */
+  height: 120px;
 }
 
 .logo {
