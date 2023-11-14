@@ -4,17 +4,18 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
-    <div class="navbar">
-      <img alt="Guru logo" class="logo" src="@/assets/OIG-removebg-preview.png" width="175" height="175" />
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <header class="bg-dark">
+      <div class="container d-flex align-items-center justify-content-between">
+        <img alt="Guru logo" class="logo ms-auto" src="@/assets/OIG-removebg-preview.png" width="125" height="125" />
+        <nav class="d-flex">
+          <RouterLink class="nav-link ml-auto" to="/">Home</RouterLink>
+          <RouterLink class="nav-link" to="/about">About</RouterLink>
+        </nav>
+      </div>
+    </header>
+  </div>
 </template>
 
 <style scoped>
@@ -23,17 +24,14 @@ header {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000; /* Adjust the z-index as needed */
+}
+body {
+  background-color: #ffffff;
+  margin: 0;
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.container {
   padding: 1rem;
-  background-color: #3498db; /* You can change the background color as needed */
-  width: 100%; /* Ensure the navbar spans the width of the page */
-  height: 120px;
 }
 
 .logo {
@@ -41,21 +39,21 @@ header {
 }
 
 nav {
-  font-size: 12px;
+  font-size: 20px;
+  color: #4cda98;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.navbar-brand {
+  color: #4cda98;
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.nav-link {
+  color: #4cda98;
+  margin-left: 15px; /* Adjust the margin between links as needed */
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  color: white; /* You can customize the text color */
+.nav-link:last-child {
+  margin-right: 0;
 }
 
 @media (min-width: 1024px) {
@@ -63,7 +61,6 @@ nav a {
     display: flex;
     place-items: center;
   }
-
   nav {
     text-align: right;
   }
