@@ -15,7 +15,14 @@ export function fetchShoppingResults(query) {
       const shoppingResults = data["shopping_results"];
   
       if (shoppingResults && Array.isArray(shoppingResults)) {
-        resolve(shoppingResults);
+        // Extract only the required information for each item
+        const simplifiedResults = shoppingResults.map(item => ({
+          title: item.title,
+          source: item.source,
+          thumbnail: item.thumbnail,
+        }));
+
+        resolve(simplifiedResults);
       } else {
         reject("No valid shopping results found in the JSON response.");
       }
