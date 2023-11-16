@@ -61,7 +61,10 @@ export default {
       this.searchBars.push({ id: newIndex });
       this.groceryItems.push('');
       this.$nextTick(() => {
-        this.$refs.inputFields[index + 1].focus(); // Focus on the next input field
+        const nextIndex = index + 1;
+        if (nextIndex < this.$refs.inputFields.length) {
+          this.$refs.inputFields[nextIndex].focus(); 
+        }
       });
     },
     saveAllItems() {
