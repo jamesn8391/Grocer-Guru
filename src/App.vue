@@ -6,7 +6,7 @@ import { RouterLink, RouterView } from 'vue-router'
   
   <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
     <div class="container-fluid">
-      <img alt="Guru logo" class="logo" src="@/assets/OIG-removebg-preview.png" width="150" height="150" /> 
+      <img alt="Guru logo" class="logo" src="@/assets/GrocerGuruLogo.png" width="150" height="150" /> 
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <router-link to="/" class="nav-link">Home</router-link>
         <router-link to="/about" class="nav-link">About</router-link>
