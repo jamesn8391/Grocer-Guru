@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  
   <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
     <div class="container-fluid">
       <img alt="Guru logo" class="logo" src="@/assets/OIG-removebg-preview.png" width="150" height="150" /> 
@@ -25,11 +25,12 @@ import { RouterLink, RouterView } from 'vue-router'
         aria-label="Search"
       />
     </div>
+
     <button @click="addSearchBar" class="btn btn-primary mt-3">
       <i class="fas fa-plus"></i> Add Grocery Item
     </button>
     
-    <button class="btn btn-success mt-3 ml-3">
+    <button @click="saveAllItems" class="btn btn-success mt-3 ml-3">
       All Items Added
     </button>
 
@@ -41,14 +42,21 @@ import { RouterLink, RouterView } from 'vue-router'
 export default {
   data() {
     return {
-      searchBars: [{ id: 0 }] // Initial search bar
+      searchBars: [{ id: 0 }] 
+    };
+    return {
+      groceryItems: [{ name: '' }]
     };
   },
   methods: {
     addSearchBar() {
       const newIndex = this.searchBars.length;
       this.searchBars.push({ id: newIndex });
+      this.groceryItems.push({ name: '' });
     }
+  },
+  saveAllItems() {
+      console.log('All items:', this.groceryItems);
   }
 };
 </script>
@@ -72,6 +80,9 @@ nav {
 }
 .container {
   padding: 1rem;
+}
+.btn {
+  margin-right: 10px;
 }
 
 .custom-btn-color {
