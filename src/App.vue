@@ -1,56 +1,90 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <div>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div class="container-fluid">
-        <img alt="Guru logo" class="logo" src="@/assets/OIG-removebg-preview.png" width="150" height="150" /> 
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-          <router-link to="/" class="nav-link">Home</router-link>
-          <router-link to="/about" class="nav-link">About</router-link>
-        </div>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
+    <div class="container-fluid">
+      <img alt="Guru logo" class="logo" src="@/assets/OIG-removebg-preview.png" width="150" height="150" /> 
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <router-link to="/" class="nav-link">Home</router-link>
+        <router-link to="/about" class="nav-link">About</router-link>
       </div>
-    </nav>
+    </div>
+  </nav>
+
+  <div class="container mt-5 pt-5 text-center">
+    <p class="font-size-lg">Welcome to Grocer Guru!<br>Get started by adding items.</p>
+    <div v-for="(searchBar, index) in searchBars" :key="index" class="form-outline">
+      <input
+        type="search"
+        :id="'form' + index"
+        class="form-control"
+        :placeholder="'Enter Grocery Item ' + (index + 1)"
+        aria-label="Search"
+      />
+    </div>
+    <button @click="addSearchBar" class="btn btn-primary mt-3">
+      <i class="fas fa-plus"></i> Add Grocery Item
+    </button>
+    
+    <button class="btn btn-success mt-3 ml-3">
+      All Items Added
+    </button>
+
   </div>
+  
 </template>
 
-<style scoped>
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
+<script>
+export default {
+  data() {
+    return {
+      searchBars: [{ id: 0 }] // Initial search bar
+    };
+  },
+  methods: {
+    addSearchBar() {
+      const newIndex = this.searchBars.length;
+      this.searchBars.push({ id: newIndex });
+    }
+  }
+};
+</script>
 
-.container {
-  padding: 1rem;
-}
-.logo {
-  display: inline-flex;
-  pointer-events: none;
+<style scoped>
+.font-size-lg {
+  font-size: 2rem; 
 }
 nav {
   font-size: 20px;
   color: #4cda98;
   height: 100px;
 }
-/* Remove the hover color for the logo by overriding Bootstrap styles */
-.navbar-dark .navbar-nav .nav-link:hover {
-  color: #4cda98; /* Set the color to the desired non-hover color */
+
+.logo {
+  display: inline-flex;
+  pointer-events: none;
 }
-.navbar-brand {
-  color: #4cda98;
+.custom-navbar {
+    background-color: #f0f0f0; 
 }
-.nav-link {
-  color: #4cda98;
-  margin-left: 15px; /* Adjust the margin between links as needed */
+.container {
+  padding: 1rem;
 }
-.nav-link:last-child {
-  margin-right: 0;
+
+.custom-btn-color {
+    background-color: #4cda98;
+    color: #ffffff; 
+}
+.custom-btn-outline {
+  border-color: #4cda98;
+}
+
+.custom-btn-outline:hover {
+  background-color: #4cda98;
+  border-color: #4cda98;
 }
 @media (min-width: 1024px) {
   header {
