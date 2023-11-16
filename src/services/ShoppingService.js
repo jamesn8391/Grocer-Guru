@@ -1,7 +1,7 @@
 require('dotenv').config();
 const { getJson } = require("serpapi");
 
-export function fetchShoppingResults(query, location) {
+export function fetchShoppingResults(query) {
   return new Promise((resolve, reject) => {
     getJson({
       engine: "google",
@@ -10,7 +10,7 @@ export function fetchShoppingResults(query, location) {
       tbs: "mr:1,merchagg:g784994%7Cm10046|m122214550|g8299768%7Cm8175035|g126652263%7Cm117989436",
       q: query,  
       num: 100,
-      location: location,
+      location: 'College Station, Texas',
     }, (data) => {
       const shoppingResults = data["shopping_results"];
   
