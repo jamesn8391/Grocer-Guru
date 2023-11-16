@@ -23,18 +23,20 @@
   <div v-if="showGroceryList" class="container mt-5 pt-5 text-center">
     <div v-for="(searchBar, index) in searchBars" :key="index" class="form-outline">
       <input
+        ref="inputFields"
+        v-model="groceryItems[index]"
         type="search"
         :id="'form' + index"
         class="form-control"
         :placeholder="'Enter Grocery Item ' + (index + 1)"
         aria-label="Search"
+        @keydown.enter.prevent="addSearchBar(index)"
       />
     </div>
 
     <button @click="saveAllItems" class="btn btn-success mt-3 ml-3">
       All Items Added
     </button>
-
   </div>
 </template>
 
@@ -43,18 +45,24 @@ export default {
   data() {
     return {
       showGroceryList: false,
-      searchBars: [{ id: 0 }],
+      searchBars: [],
       groceryItems: []
     };
   },
   methods: {
     toggleGroceryList() {
       this.showGroceryList = !this.showGroceryList;
+      if (this.showGroceryList) {
+        this.addSearchBar();
+      }
     },
-    addSearchBar() {
+    addSearchBar(index) {
       const newIndex = this.searchBars.length;
       this.searchBars.push({ id: newIndex });
-      this.groceryItems.push();
+      this.groceryItems.push('');
+      this.$nextTick(() => {
+        this.$refs.inputFields[index + 1].focus(); // Focus on the next input field
+      });
     },
     saveAllItems() {
       console.log('All items:', this.groceryItems);
