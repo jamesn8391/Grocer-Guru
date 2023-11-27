@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="row justify-content-center">
-      <div v-if="showGroceryList" class="col-5 mt-3 pt-5 text-center">
+      <div v-if="showGroceryList && !isLoading" class="col-5 mt-3 pt-5 text-center">
         <h2 class="h2"> Your Grocery List:</h2>
         <div v-for="(searchBar, index) in searchBars" :key="index" class="form-outline my-4">
           <input ref="inputFields" v-model="groceryItems[index]" type="search" :id="'form' + index" class="form-control"
@@ -27,6 +27,8 @@
             @keydown.enter.prevent="addSearchBar(index)" />
         </div>
         <button @click="search" class="btn btn-success mx-5"> Find Best Price</button>
+      </div>
+      <div v-if="isLoading" class="spinner-border mt-5" role="status">
       </div>
     </div>
   </div>
@@ -37,7 +39,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      loading: false,
+      isLoading: false,
       showGroceryList: false,
       searchBars: [],
       groceryItems: [],
@@ -63,21 +65,22 @@ export default {
       });
     },
     search() {
+      this.shoppingResults = [];
       this.groceryItems.forEach((item) => {
         this.fetchShoppingResults(item);
       });
     },
-    async fetchShoppingResults(query) {
-      this.loading = true;
-      await axios.get('/shopping-results?q=' + query)
+    fetchShoppingResults(query) {
+      this.isLoading = true;
+      axios.get('/shopping-results?q=' + query)
         .then(response => {
           this.shoppingResults.push(response.data);
-          this.loading = false;
+          this.isLoading = false;
           console.log('Shopping Results:', this.shoppingResults); // Print results to console
         })
         .catch(error => {
           this.error = error.response ? error.response.data.error : 'An error occurred.';
-          this.loading = false;
+          this.isLoading = false;
           console.error('Error:', this.error); // Print error to console
         });
     },
@@ -98,5 +101,4 @@ export default {
 .btn {
   margin-right: 10px;
 }
-
 </style>
