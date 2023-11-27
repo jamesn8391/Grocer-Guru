@@ -37,6 +37,7 @@ app.get('/shopping-results', (req, res) => {
         title: item.title,
         source: item.source,
         thumbnail: item.thumbnail,
+        price: item.price,
       }));
 
       res.json(simplifiedResults);

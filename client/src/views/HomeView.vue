@@ -37,20 +37,19 @@
     <button @click="saveAllItems" class="btn btn-success mt-3 ml-3">
       All Items Added
     </button>
-    <button @click="handleShoppingResults" class="btn btn-success mt-3 ml-3">
-      Query ShoppingService
-    </button>
+    <button @click="search" class="btn btn-success mt-3 ml-3"> Search</button>
   </div>
 </template>
 
 <script>
-import { fetchShoppingResults } from '@/services/ShoppingService';
+import axios from 'axios';
 export default {
   data() {
     return {
       showGroceryList: false,
       searchBars: [],
-      groceryItems: []
+      groceryItems: [],
+      shoppingResults: [],
     };
   },
   methods: {
@@ -71,16 +70,22 @@ export default {
         }
       });
     },
-    handleShoppingResults() {
-      const query = 'bananas'; // Set your search query here
-      fetchShoppingResults(query)
-        .then(results => {
-          // Handle the results
-          console.log(results);
+    search() {
+      const query = 'tomatoes'; // Replace with your desired query
+      this.fetchShoppingResults(query);
+    },
+    fetchShoppingResults(query) {
+      this.loading = true;
+      axios.get('/shopping-results?q=' + query)
+        .then(response => {
+          this.shoppingResults = response.data;
+          this.loading = false;
+          console.log('Shopping Results:', this.shoppingResults); // Print results to console
         })
         .catch(error => {
-          // Handle the error
-          console.error(error);
+          this.error = error.response ? error.response.data.error : 'An error occurred.';
+          this.loading = false;
+          console.error('Error:', this.error); // Print error to console
         });
     },
     saveAllItems() {
