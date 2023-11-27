@@ -12,6 +12,7 @@
     "bootstrap": "^5.3.2",
     "bootstrap-vue": "^2.23.1",
     "dotenv": "^16.3.1",
+    "querystring": "^0.2.1",
     "serpapi": "^2.0.0",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"

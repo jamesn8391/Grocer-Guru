@@ -1,6 +1,8 @@
 const env = import.meta.env;
 import { getJson } from 'serpapi';
-
+import querystring from 'querystring';
+window.querystring = querystring;
+import http from 'http';
 
 export function fetchShoppingResults(query) {
   return new Promise((resolve, reject) => {
