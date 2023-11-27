@@ -69,11 +69,12 @@ export default {
       this.isLoading = true;
 
       Promise.all(
-        this.groceryItems.map(item => this.shoppingResults.push(this.fetchShoppingResults(item)))
+        this.groceryItems.map(item => this.fetchShoppingResults(item))
       )
-        .then(() => {
+        .then(results => {
+          this.shoppingResults = results;
           this.isLoading = false;
-          console.log(this.shoppingResults)
+          console.log(this.shoppingResults);
         })
         .catch(error => {
           this.isLoading = false;
@@ -86,11 +87,11 @@ export default {
         const response = await axios.get('/shopping-results?q=' + query);
         //console.log('Shopping Results:', response.data);
         return response.data;
-        
+
       } catch (error) {
         this.error = error.response ? error.response.data.error : 'An error occurred.';
         console.error('Error:', this.error);
-        return {'Error': this.error};
+        return { 'Error': this.error };
       }
     },
   }
