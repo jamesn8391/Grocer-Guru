@@ -37,10 +37,14 @@
     <button @click="saveAllItems" class="btn btn-success mt-3 ml-3">
       All Items Added
     </button>
+    <button @click="handleShoppingResults" class="btn btn-success mt-3 ml-3">
+      Query ShoppingService
+    </button>
   </div>
 </template>
 
 <script>
+import { fetchShoppingResults } from '@/services/ShoppingService';
 export default {
   data() {
     return {
@@ -66,6 +70,18 @@ export default {
           this.$refs.inputFields[nextIndex].focus(); 
         }
       });
+    },
+    handleShoppingResults() {
+      const query = 'bananas'; // Set your search query here
+      fetchShoppingResults(query)
+        .then(results => {
+          // Handle the results
+          console.log(results);
+        })
+        .catch(error => {
+          // Handle the error
+          console.error(error);
+        });
     },
     saveAllItems() {
       console.log('All items:', this.groceryItems);
