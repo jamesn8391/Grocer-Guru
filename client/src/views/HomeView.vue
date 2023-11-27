@@ -2,14 +2,14 @@
 </script>
 
 <template>
-  <div class="container mt-5">
+  <div class="container my-5">
     <div class="row bg-color">
       <div class="col">
         <img alt="Background" src="@/assets/background.jpg" style="width: 100%;">
       </div>
       <div class="col">
         <div class="container mt-5 pt-5 text-center">
-          <h1>
+          <h1 class="h1">
             Welcome to Grocer Guru!<br>Get started by adding items.
           </h1>
           <button @click="toggleGroceryList" class="btn btn-secondary mt-3">
@@ -18,26 +18,17 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div v-if="showGroceryList" class="container mt-5 pt-5 text-center">
-    <div v-for="(searchBar, index) in searchBars" :key="index" class="form-outline">
-      <input
-        ref="inputFields"
-        v-model="groceryItems[index]"
-        type="search"
-        :id="'form' + index"
-        class="form-control"
-        :placeholder="'Enter Grocery Item ' + (index + 1)"
-        aria-label="Search"
-        @keydown.enter.prevent="addSearchBar(index)"
-      />
+    <div class="row justify-content-center">
+      <div v-if="showGroceryList" class="col-5 mt-3 pt-5 text-center">
+        <h2 class="h2"> Your Grocery List:</h2>
+        <div v-for="(searchBar, index) in searchBars" :key="index" class="form-outline my-4">
+          <input ref="inputFields" v-model="groceryItems[index]" type="search" :id="'form' + index" class="form-control"
+            :placeholder="'Enter Grocery Item ' + (index + 1)" aria-label="Search"
+            @keydown.enter.prevent="addSearchBar(index)" />
+        </div>
+        <button @click="search" class="btn btn-success mx-5"> Find Best Price</button>
+      </div>
     </div>
-
-    <button @click="saveAllItems" class="btn btn-success mt-3 ml-3">
-      All Items Added
-    </button>
-    <button @click="search" class="btn btn-success mt-3 ml-3"> Search</button>
   </div>
 </template>
 
@@ -46,6 +37,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      loading: false,
       showGroceryList: false,
       searchBars: [],
       groceryItems: [],
@@ -66,19 +58,20 @@ export default {
       this.$nextTick(() => {
         const nextIndex = index + 1;
         if (nextIndex < this.$refs.inputFields.length) {
-          this.$refs.inputFields[nextIndex].focus(); 
+          this.$refs.inputFields[nextIndex].focus();
         }
       });
     },
     search() {
-      const query = 'tomatoes'; // Replace with your desired query
-      this.fetchShoppingResults(query);
+      this.groceryItems.forEach((item) => {
+        this.fetchShoppingResults(item);
+      });
     },
-    fetchShoppingResults(query) {
+    async fetchShoppingResults(query) {
       this.loading = true;
-      axios.get('/shopping-results?q=' + query)
+      await axios.get('/shopping-results?q=' + query)
         .then(response => {
-          this.shoppingResults = response.data;
+          this.shoppingResults.push(response.data);
           this.loading = false;
           console.log('Shopping Results:', this.shoppingResults); // Print results to console
         })
@@ -88,18 +81,16 @@ export default {
           console.error('Error:', this.error); // Print error to console
         });
     },
-    saveAllItems() {
-      console.log('All items:', this.groceryItems);
-    }
   }
 };
 </script>
 
 <style scoped>
 .font-size-lg {
-  font-size: 2rem; 
+  font-size: 2rem;
   font-family: sans-serif;
 }
+
 .bg-color {
   background-color: #cedcdd;
 }
@@ -107,4 +98,5 @@ export default {
 .btn {
   margin-right: 10px;
 }
+
 </style>

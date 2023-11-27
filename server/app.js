@@ -24,7 +24,7 @@ app.get('/shopping-results', (req, res) => {
     api_key: serpApiKey,
     tbm: "shop",
     q: query,
-    num: 100,
+    num: 25,
     location: 'College Station, Texas',
     searchParams: {
       tbs: "mr:1,merchagg:g784994%7Cm10046|m122214550|g8299768%7Cm8175035|g126652263%7Cm117989436",
