@@ -66,23 +66,32 @@ export default {
     },
     search() {
       this.shoppingResults = [];
-      this.groceryItems.forEach((item) => {
-        this.fetchShoppingResults(item);
-      });
-    },
-    fetchShoppingResults(query) {
       this.isLoading = true;
-      axios.get('/shopping-results?q=' + query)
-        .then(response => {
-          this.shoppingResults.push(response.data);
+
+      Promise.all(
+        this.groceryItems.map(item => this.shoppingResults.push(this.fetchShoppingResults(item)))
+      )
+        .then(() => {
           this.isLoading = false;
-          console.log('Shopping Results:', this.shoppingResults); // Print results to console
+          console.log(this.shoppingResults)
         })
         .catch(error => {
-          this.error = error.response ? error.response.data.error : 'An error occurred.';
           this.isLoading = false;
-          console.error('Error:', this.error); // Print error to console
+          console.error('Error:', error);
         });
+    },
+
+    async fetchShoppingResults(query) {
+      try {
+        const response = await axios.get('/shopping-results?q=' + query);
+        //console.log('Shopping Results:', response.data);
+        return response.data;
+        
+      } catch (error) {
+        this.error = error.response ? error.response.data.error : 'An error occurred.';
+        console.error('Error:', this.error);
+        return {'Error': this.error};
+      }
     },
   }
 };
