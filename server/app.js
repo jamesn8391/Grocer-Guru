@@ -1,7 +1,8 @@
 const express = require('express');
 const { getJson } = require('serpapi');
 const querystring = require('querystring');
-require('dotenv').config()
+const axios = require('axios');
+require('dotenv').config();
 
 const app = express();
 const port = 3001;
@@ -48,7 +49,7 @@ app.get('/shopping-results', (req, res) => {
 });
 
 app.get('/chat', async (req, res) => {
-  const userPrompt = req.query.prompt;
+  const userPrompt = req.query.q;
 
   if (!userPrompt) {
     return res.status(400).json({ error: 'Missing prompt parameter.' });
@@ -57,20 +58,43 @@ app.get('/chat', async (req, res) => {
   try {
     const chatGptApiKey = process.env.CHATGPT_API_KEY;
 
-    const chatGptResponse = await axios.post(
-      'https://api.openai.com/v1/engines/text-davinci-003/completions',
-      {
-        prompt: userPrompt,
-        max_tokens: 150,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${chatGptApiKey}`,
-        },
-      }
-    );
+    // Implement a function to make the OpenAI request with retry logic
+    const makeOpenAIRequest = async () => {
+      try {
+        const response = await axios.post(
+          'https://api.openai.com/v1/engines/text-davinci-003/completions',
+          {
+            prompt: userPrompt,
+            max_tokens: 150,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${chatGptApiKey}`,
+            },
+          }
+        );
+        return response.data.choices[0].text;
+      } catch (error) {
+        if (error.response && error.response.status === 429) {
+          // Check if the 'retry-after' header is present
+          const retryAfter = error.response.headers['retry-after'];
 
-    const generatedText = chatGptResponse.data.choices[0].text;
+          if (retryAfter) {
+            console.log(`Rate limit exceeded. Waiting for ${retryAfter} seconds.`);
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+            return makeOpenAIRequest(); // Retry the request
+          } else {
+            console.log('Rate limit exceeded. Waiting for a default 5 seconds.');
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            return makeOpenAIRequest(); // Retry the request
+          }
+        } else {
+          throw error; // Propagate other errors
+        }
+      }
+    };
+
+    const generatedText = await makeOpenAIRequest();
 
     res.json({ response: generatedText });
   } catch (error) {
