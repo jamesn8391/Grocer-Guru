@@ -2,9 +2,14 @@ const express = require('express');
 const { getJson } = require('serpapi');
 const querystring = require('querystring');
 require('dotenv').config()
+const axios = require('axios');
+const OpenAI = require('openai');
 
+
+const openai = new OpenAI({apiKey: process.env.CHATGPT_API_KEY});
 const app = express();
 const port = 3001;
+app.use(express.json());
 
 app.get('/', function (req, res) {
   res.send('Hello World!');
@@ -47,37 +52,32 @@ app.get('/shopping-results', (req, res) => {
   });
 });
 
-app.get('/chat', async (req, res) => {
-  const userPrompt = req.query.prompt;
-
-  if (!userPrompt) {
-    return res.status(400).json({ error: 'Missing prompt parameter.' });
-  }
-
+app.post('/ask', async (req, res) => {
   try {
-    const chatGptApiKey = process.env.CHATGPT_API_KEY;
+    if (!req.body || !req.body.prompt) {
+      throw new Error("Invalid request. 'prompt' is missing in the request body.");
+    }
 
-    const chatGptResponse = await axios.post(
-      'https://api.openai.com/v1/engines/text-davinci-003/completions',
-      {
-        prompt: userPrompt,
-        max_tokens: 150,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${chatGptApiKey}`,
-        },
-      }
-    );
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{
+        role: "user", 
+        content: req.body.prompt
+      }]
+    });
 
-    const generatedText = chatGptResponse.data.choices[0].text;
-
-    res.json({ response: generatedText });
+    res.status(200).json({
+      message: completion.choices[0].message.content
+    });
   } catch (error) {
-    console.error('Error calling ChatGPT API:', error);
-    res.status(500).json({ error: 'Internal server error.' });
+    console.error('Error processing request:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
