@@ -47,6 +47,38 @@ app.get('/shopping-results', (req, res) => {
   });
 });
 
+app.get('/chat', async (req, res) => {
+  const userPrompt = req.query.prompt;
+
+  if (!userPrompt) {
+    return res.status(400).json({ error: 'Missing prompt parameter.' });
+  }
+
+  try {
+    const chatGptApiKey = process.env.CHATGPT_API_KEY;
+
+    const chatGptResponse = await axios.post(
+      'https://api.openai.com/v1/engines/text-davinci-003/completions',
+      {
+        prompt: userPrompt,
+        max_tokens: 150,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${chatGptApiKey}`,
+        },
+      }
+    );
+
+    const generatedText = chatGptResponse.data.choices[0].text;
+
+    res.json({ response: generatedText });
+  } catch (error) {
+    console.error('Error calling ChatGPT API:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
