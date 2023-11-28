@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="container my-5">
+  <div class="container mb-5">
     <div class="row bg-color">
       <div class="col">
         <img alt="Background" src="@/assets/background.jpg" style="width: 100%;">
@@ -93,6 +93,10 @@ export default {
 
 .bg-color {
   background-color: #cedcdd;
+}
+
+.container{
+  margin-top: 180px;
 }
 
 .btn {
