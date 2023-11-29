@@ -34,7 +34,7 @@ import Modal from '../components/Modal.vue';
       </div>
     </div>
 
-    <div>
+    <div v-if="!isLoading && showModal">
       <Modal/>
     </div>
 
@@ -48,6 +48,7 @@ export default {
     return {
       isLoading: false,
       showGroceryList: false,
+      showModal: false,
       searchBars: [],
       groceryItems: [],
       shoppingResults: [],
@@ -81,6 +82,7 @@ export default {
         .then(results => {
           this.shoppingResults = results;
           this.isLoading = false;
+          this.showModal = true;
           console.log(this.shoppingResults);
         })
         .catch(error => {
