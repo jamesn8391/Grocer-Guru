@@ -33,9 +33,8 @@ import Modal from '../components/Modal.vue';
       <div v-if="isLoading" class="spinner-border mt-5" role="status">
       </div>
     </div>
-    <button @click="askMrGPT('how far is the sun from earth')" class="btn btn-success mx-5"> Test Mr.GPT</button>
 
-    <div v-if="!isLoading && showModal">
+    <div>
       <Modal :shoppingResults="shoppingResults" />
     </div>
 
@@ -45,6 +44,7 @@ import Modal from '../components/Modal.vue';
 <script>
 import { fetchShoppingResults } from '../services/ShoppingService';
 import { queryChatGPT } from '../services/ChatGPTService';
+import { calibrationQueryHelper } from '../utils/CalibrationResponseHelper'
 
 export default {
   data() {
@@ -82,25 +82,44 @@ export default {
       Promise.all(
         this.groceryItems.map(item => fetchShoppingResults(item))
       )
-        .then(results => {
+        .then(async results => {
           this.shoppingResults = results;
-          this.isLoading = false;
-          this.showModal = true;
           console.log(this.shoppingResults);
+
+          // Wait for CalibrateChatGPT to complete before setting isLoading to false
+          var answer = await this.CalibrateChatGPT();
+
+          this.isLoading = false;
+          this.showModal = false; // fix this when merging
         })
         .catch(error => {
           this.isLoading = false;
           console.error('Error:', error);
         });
     },
-    async askMrGPT(query) {
+
+    async CalibrateChatGPT() {
       try {
-        const result = await queryChatGPT(query);
-        console.log(result);
+        for (let i = 0; i < this.groceryItems.length; i++) {
+          var item = this.groceryItems[i];
+          var query = "You are a price-conscious buyer and are trying to hunt for the best grocery store deals given a set of data. Given the following JSON, determine the best 3 deals when a customer is requesting " + item + " on their grocery list. Format your response as the JSON with only the top 3 results included. Keep all the JSON data the same. \n";
+          query += JSON.stringify(this.shoppingResults[i]);
+          console.log(query);
+
+          const result = await queryChatGPT(query);
+          var JSONstring = result["message"];
+          console.log(calibrationQueryHelper(JSONstring));
+
+          // Use return value to handle the result as needed
+          return calibrationQueryHelper(JSONstring);
+        }
       } catch (error) {
         console.error(error);
+        console.log(this.shoppingResults.map(innerList => innerList.slice(0, 3)));
+        return { "error": "loser" };
       }
     },
+
   },
 };
 </script>
@@ -115,7 +134,7 @@ export default {
   background-color: #cedcdd;
 }
 
-.container{
+.container {
   margin-top: 180px;
 }
 
