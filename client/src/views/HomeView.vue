@@ -36,7 +36,7 @@ import Modal from '../components/Modal.vue';
     <button @click="askMrGPT('how far is the sun from earth')" class="btn btn-success mx-5"> Test Mr.GPT</button>
 
     <div v-if="!isLoading && showModal">
-      <Modal/>
+      <Modal :shoppingResults="shoppingResults" />
     </div>
 
   </div>
