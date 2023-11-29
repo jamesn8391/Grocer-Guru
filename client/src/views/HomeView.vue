@@ -15,7 +15,7 @@ import Modal from '../components/Modal.vue';
             Welcome to Grocer Guru!<br>Get started by adding items.
           </h1>
           <button @click="toggleGroceryList" class="btn btn-secondary mt-3">
-            <i class="fas fa-plus"></i> Add Grocery List
+            Add Grocery List
           </button>
         </div>
       </div>
@@ -35,7 +35,7 @@ import Modal from '../components/Modal.vue';
     </div>
 
     <div v-if="showModal">
-      <Modal :shoppingResults="calibrationResults" />
+      <Modal :calibrationResults="shoppingResults" :selectedItems="selectedItems" />
     </div>
 
   </div>
@@ -56,6 +56,7 @@ export default {
       groceryItems: [],
       shoppingResults: [],
       calibrationResults: [],
+      selectedItems: [],
     };
   },
   methods: {
@@ -88,7 +89,7 @@ export default {
           console.log(this.shoppingResults);
 
           // Wait for CalibrateChatGPT to complete before setting isLoading to false
-          this.calibrationResults = await this.CalibrateChatGPT();
+          //this.calibrationResults = await this.CalibrateChatGPT();
 
           this.isLoading = false;
           this.showModal = true; // fix this when merging
