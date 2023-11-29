@@ -46,6 +46,7 @@ import Modal from '../components/Modal.vue';
 <script>
 import { fetchShoppingResults } from '../services/ShoppingService';
 import { queryChatGPT } from '../services/ChatGPTService';
+import { calibrationQueryHelper } from '../utils/CalibrationResponseHelper'
 
 export default {
   data() {
@@ -104,7 +105,8 @@ export default {
             query += JSON.stringify(this.shoppingResults[i]);
             console.log(query);
             const result = await queryChatGPT(query);
-            console.log(result["message"]);
+            var JSONstring = result["message"];
+            console.log(calibrationQueryHelper(JSONstring));
           }
         }
       }
