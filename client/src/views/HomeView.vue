@@ -33,6 +33,7 @@ import Modal from '../components/Modal.vue';
       <div v-if="isLoading" class="spinner-border mt-5" role="status">
       </div>
     </div>
+    <button @click="askMrGPT('how far is the sun from earth')" class="btn btn-success mx-5"> Test Mr.GPT</button>
 
     <div v-if="!isLoading && showModal">
       <Modal/>
@@ -43,6 +44,8 @@ import Modal from '../components/Modal.vue';
 
 <script>
 import { fetchShoppingResults } from '../services/ShoppingService';
+import { queryChatGPT } from '../services/ChatGPTService';
+
 export default {
   data() {
     return {
@@ -90,7 +93,15 @@ export default {
           console.error('Error:', error);
         });
     },
-  }
+    async askMrGPT(query) {
+      try {
+        const result = await queryChatGPT(query);
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  },
 };
 </script>
 
