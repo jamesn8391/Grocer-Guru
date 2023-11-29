@@ -1,8 +1,10 @@
 <script setup>
+import Modal from '../components/Modal.vue';
+
 </script>
 
 <template>
-  <div class="container my-5">
+  <div class="container mb-5">
     <div class="row bg-color">
       <div class="col">
         <img alt="Background" src="@/assets/background.jpg" style="width: 100%;">
@@ -32,6 +34,11 @@
       </div>
     </div>
     <button @click="askMrGPT('how far is the sun from earth')" class="btn btn-success mx-5"> Test Mr.GPT</button>
+
+    <div v-if="!isLoading && showModal">
+      <Modal/>
+    </div>
+
   </div>
 </template>
 
@@ -44,6 +51,7 @@ export default {
     return {
       isLoading: false,
       showGroceryList: false,
+      showModal: false,
       searchBars: [],
       groceryItems: [],
       shoppingResults: [],
@@ -77,6 +85,7 @@ export default {
         .then(results => {
           this.shoppingResults = results;
           this.isLoading = false;
+          this.showModal = true;
           console.log(this.shoppingResults);
         })
         .catch(error => {
@@ -104,6 +113,10 @@ export default {
 
 .bg-color {
   background-color: #cedcdd;
+}
+
+.container{
+  margin-top: 180px;
 }
 
 .btn {
