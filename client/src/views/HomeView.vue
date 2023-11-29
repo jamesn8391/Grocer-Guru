@@ -34,7 +34,7 @@ import Modal from '../components/Modal.vue';
       </div>
     </div>
 
-    <div>
+    <div v-if="!isLoading && showModal">
       <Modal :shoppingResults="shoppingResults" />
     </div>
 
@@ -90,7 +90,7 @@ export default {
           var answer = await this.CalibrateChatGPT();
 
           this.isLoading = false;
-          this.showModal = false; // fix this when merging
+          this.showModal = true; // fix this when merging
         })
         .catch(error => {
           this.isLoading = false;
