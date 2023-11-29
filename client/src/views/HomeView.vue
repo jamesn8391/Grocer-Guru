@@ -141,7 +141,7 @@ export default {
 }
 
 .container {
-  margin-top: 180px;
+  margin-top: 150px;
 }
 
 .btn {
