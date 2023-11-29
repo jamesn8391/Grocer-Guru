@@ -34,8 +34,8 @@ import Modal from '../components/Modal.vue';
       </div>
     </div>
 
-    <div v-if="!isLoading && showModal">
-      <Modal />
+    <div>
+      <Modal :shoppingResults="shoppingResults" />
     </div>
 
   </div>
