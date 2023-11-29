@@ -34,8 +34,8 @@ import Modal from '../components/Modal.vue';
       </div>
     </div>
 
-    <div v-if="!isLoading && showModal">
-      <Modal :shoppingResults="shoppingResults" />
+    <div v-if="showModal">
+      <Modal :shoppingResults="calibrationResults" />
     </div>
 
   </div>
@@ -55,6 +55,7 @@ export default {
       searchBars: [],
       groceryItems: [],
       shoppingResults: [],
+      calibrationResults: [],
     };
   },
   methods: {
@@ -87,7 +88,7 @@ export default {
           console.log(this.shoppingResults);
 
           // Wait for CalibrateChatGPT to complete before setting isLoading to false
-          var answer = await this.CalibrateChatGPT();
+          this.calibrationResults = await this.CalibrateChatGPT();
 
           this.isLoading = false;
           this.showModal = true; // fix this when merging
@@ -100,7 +101,9 @@ export default {
 
     async CalibrateChatGPT() {
       try {
-        for (let i = 0; i < this.groceryItems.length; i++) {
+        var calibrationResult = []
+        
+        for (let i = 0; i < 3; i++) {
           var item = this.groceryItems[i];
           var query = "You are a price-conscious buyer and are trying to hunt for the best grocery store deals given a set of data. Given the following JSON, determine the best 3 deals when a customer is requesting " + item + " on their grocery list. Format your response as the JSON with only the top 3 results included. Keep all the JSON data the same. \n";
           query += JSON.stringify(this.shoppingResults[i]);
@@ -111,8 +114,10 @@ export default {
           console.log(calibrationQueryHelper(JSONstring));
 
           // Use return value to handle the result as needed
-          return calibrationQueryHelper(JSONstring);
+          calibrationResult.push(calibrationQueryHelper(JSONstring));
         }
+        return calibrationResult;
+
       } catch (error) {
         console.error(error);
         console.log(this.shoppingResults.map(innerList => innerList.slice(0, 3)));

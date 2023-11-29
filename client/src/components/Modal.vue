@@ -9,11 +9,11 @@
                             :class="{ active: resultIndex === 0 }">
                             <div class="row rowWidth justify-content-center">
                                 <div v-for="n in 3" class="col">
-                                    <div class="item-container" v-if="result[n]">
-                                        <img :src="result[n].thumbnail" width="100%" class="d-block w-100">
-                                        <h5>{{ result[n].title }}</h5>
-                                        <h5>{{ result[n].price }}</h5>
-                                        <h5>{{ result[n].source }}</h5>
+                                    <div class="item-container" v-if="result[n-1]">
+                                        <img :src="result[n-1].thumbnail" width="100%" class="d-block w-100">
+                                        <h5>{{ result[n-1].title }}</h5>
+                                        <h5>{{ result[n-1].price }}</h5>
+                                        <h5>{{ result[n-1].source }}</h5>
                                     </div>
                                     <button type="button" class="btn btn-success">Select</button>
                                 </div>
