@@ -1,4 +1,6 @@
 <script setup>
+import Modal from '../components/Modal.vue';
+
 </script>
 
 <template>
@@ -31,6 +33,11 @@
       <div v-if="isLoading" class="spinner-border mt-5" role="status">
       </div>
     </div>
+
+    <div>
+      <Modal/>
+    </div>
+
   </div>
 </template>
 
