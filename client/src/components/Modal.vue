@@ -5,17 +5,32 @@
             <div class="container mt-3">
                 <div id="groceryCarousel" class="carousel slide">
                     <div class="carousel-inner">
-                        <div v-for="(result, resultIndex) in shoppingResults" :key="resultIndex" class="carousel-item"
+                        <div v-for="(result, resultIndex) in calibrationResults" :key="resultIndex" class="carousel-item"
                             :class="{ active: resultIndex === 0 }">
-                            <div class="row rowWidth justify-content-center">
+                            <div class="row justify-content-center">
                                 <div v-for="n in 3" class="col">
-                                    <div class="item-container" v-if="result[n-1]">
-                                        <img :src="result[n-1].thumbnail" width="100%" class="d-block w-100">
-                                        <h5>{{ result[n-1].title }}</h5>
-                                        <h5>{{ result[n-1].price }}</h5>
-                                        <h5>{{ result[n-1].source }}</h5>
+                                    <div class="item-container" v-if="result[n - 1]">
+                                        <img :src="result[n - 1].thumbnail" width="100%" class="d-block w-100">
+                                        <h5>{{ result[n - 1].title }}</h5>
+                                        <h5>{{ result[n - 1].price }}</h5>
+                                        <h5>{{ result[n - 1].source }}</h5>
                                     </div>
-                                    <button type="button" class="btn btn-success">Select</button>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-5">
+                                        <!-- <div>Selected: {{ selectedItems[resultIndex] }}</div> -->
+                                        <select class="form-select form-select-md" v-model="myArray[resultIndex]">
+                                            <option disabled value="">Please select one</option>
+                                            <option>{{ result[0].title }}</option>
+                                            <option>{{ result[1].title }}</option>
+                                            <option>{{ result[2].title }}</option>
+                                        </select>
+                                    </div>
+                                    <div v-if="computeAllSelect" class="col-2">
+                                        <button @click="" class="btn btn-success">
+                                            Confirm
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -36,20 +51,31 @@
 
 <script>
 export default {
+    data() {
+        return {
+            myArray: [],
+            arrayMaxLength: 3, // Set the maximum length for your array
+        };
+    },
     props: {
-        shoppingResults: {
+        calibrationResults: {
             type: Array,
             required: true,
         },
     },
     mounted() {
-        console.log(this.shoppingResults)
+        console.log(this.calibrationResults)
         window.onload = () => {
             const carousel = new bootstrap.Carousel(document.getElementById('groceryCarousel'));
             carousel.interval = false;
         };
 
-    }
+    },
+    computed: {
+        computeAllSelect() {
+            return this.myArray.length === this.arrayMaxLength;
+        },
+    },
 }
 </script>
 
@@ -66,8 +92,8 @@ export default {
     position: fixed;
     text-align: center;
     margin: auto;
-    width: 75%;
-    height: 575px;
+    width: 75vw;
+    height: 70vh;
 }
 
 h5 {
@@ -80,12 +106,13 @@ img {
 }
 
 .item-container {
-    width: 84%;
+    width: 15vw;
+    height: 47vh;
     margin: auto;
 }
 
 .rowWidth {
-    width: 85%;
+    width: 5vw;
     margin: auto;
 }
 
@@ -101,14 +128,14 @@ img {
 .carousel-control-next {
     z-index: 2;
     position: absolute;
-    top: 50%;
+    top: 40%;
     transform: translateY(-50%);
     width: 5%;
 }
 
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    background-color: black;
+    filter: brightness(0);
 }
 </style>
   

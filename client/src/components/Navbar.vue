@@ -6,7 +6,7 @@ import { RouterLink } from 'vue-router'
     <header>
         <nav class="navbar navbar-expand-md bg-light fixed-top py-0">
             <div class="container-fluid">
-                <img alt="Guru logo" class="" src="@/assets/GrocerGuruLogo.png" width="125" height="125" />
+                <img alt="Guru logo" class="p-2" src="@/assets/GrocerGuruLogo.png" width="90" />
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                     aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
