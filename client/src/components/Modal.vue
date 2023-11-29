@@ -19,7 +19,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-5">
                                         <!-- <div>Selected: {{ selectedItems[resultIndex] }}</div> -->
-                                        <select class="form-select form-select-md" v-model="selectedItems[resultIndex]">
+                                        <select class="form-select form-select-md" v-model="myArray[resultIndex]">
                                             <option disabled value="">Please select one</option>
                                             <option>{{ result[0].title }}</option>
                                             <option>{{ result[1].title }}</option>
@@ -51,15 +51,17 @@
 
 <script>
 export default {
+    data() {
+        return {
+            myArray: [],
+            arrayMaxLength: 3, // Set the maximum length for your array
+        };
+    },
     props: {
         calibrationResults: {
             type: Array,
             required: true,
         },
-        selectedItems: {
-            type: Array,
-            required: true,
-        }
     },
     mounted() {
         console.log(this.calibrationResults)
@@ -69,26 +71,9 @@ export default {
         };
 
     },
-    methods: {
-        areAllItemsSelected(selectedList) {
-            if (!selectedList.length && (selectedList.length !== this.selectedItems.length)) {
-                return false;
-            }
-
-            for (let i = 0; i < selectedList.length; i++) {
-                // Check if the item is empty or undefined
-                if (!selectedList[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    },
     computed: {
         computeAllSelect() {
-            console.log(this.selectedItems);
-            console.log(this.areAllItemsSelected(this.selectedItems))
-            return this.areAllItemsSelected(this.selectedItems);
+            return this.myArray.length === this.arrayMaxLength;
         },
     },
 }
