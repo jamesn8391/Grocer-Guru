@@ -35,7 +35,7 @@ import Modal from '../components/Modal.vue';
     </div>
 
     <div v-if="showModal">
-      <Modal :calibrationResults="shoppingResults" :selectedItems="selectedItems" />
+      <Modal :calibrationResults="shoppingResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
     </div>
 
   </div>
@@ -100,10 +100,43 @@ export default {
         });
     },
 
+    async finalChatQuery() {
+      console.log("run")
+
+      let remainingResults = this.shoppingResults.slice();
+      remainingResults.splice(0, 3);
+
+      var query = "A user chose these three items: " + this.selectedItems.join(' ') + "with these prices " + this.findItemPrice(this.selectedItems).join(' ') + " from these stores" + this.findItemStore(this.selectedItems).join(' ') + " Given this JSON filled with different options of Groceries for different items. Find the best deal for each Grocery Item. Return the data as a JSON with only one item for each grocery.\n " + JSON.stringify(this.shoppingResults.slice(3)) + "provide the name of the store that they should go based on their previous selections. \n";
+      console.log(query);
+      console.log(query.length);
+      const result = await queryChatGPT(query);
+      console.log(result["message"]);
+    },
+
+    findItemPrice(item) {
+      var prices = []
+      for (let i = 0; i < this.shoppingResults.length; i++) {
+        if (this.shoppingResults[i].title === item) {
+          prices.push(this.shoppingResults[i].price);
+        }
+      }
+      return prices;
+    },
+
+    findItemStore(item) {
+      var stores = []
+      for (let i = 0; i < this.shoppingResults.length; i++) {
+        if (this.shoppingResults[i].source === item) {
+          stores.push(this.shoppingResults[i].price);
+        }
+      }
+      return stores;
+    },
+
     async CalibrateChatGPT() {
       try {
         var calibrationResult = []
-        
+
         for (let i = 0; i < 3; i++) {
           var item = this.groceryItems[i];
           var query = "You are a price-conscious buyer and are trying to hunt for the best grocery store deals given a set of data. Given the following JSON, determine the best 3 deals when a customer is requesting " + item + " on their grocery list. Format your response as the JSON with only the top 3 results included. Keep all the JSON data the same. \n";
@@ -114,7 +147,6 @@ export default {
           var JSONstring = result["message"];
           console.log(calibrationQueryHelper(JSONstring));
 
-          // Use return value to handle the result as needed
           calibrationResult.push(calibrationQueryHelper(JSONstring));
         }
         return calibrationResult;

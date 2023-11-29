@@ -27,7 +27,7 @@
                                         </select>
                                     </div>
                                     <div v-if="computeAllSelect" class="col-2">
-                                        <button @click="" class="btn btn-success">
+                                        <button @click="finalChatQuery" class="btn btn-success">
                                             Confirm
                                         </button>
                                     </div>
@@ -62,6 +62,10 @@ export default {
             type: Array,
             required: true,
         },
+        finalChatQuery: {
+            type: Function,
+            required: true,
+        }
     },
     mounted() {
         console.log(this.calibrationResults)
