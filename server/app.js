@@ -50,6 +50,62 @@ app.get('/shopping-results', (req, res) => {
   });
 });
 
+app.get('/shopping-results-store', (req, res) => {
+  const item = req.query.item;
+  const store = req.query.store;
+
+  if (!item) {
+    return res.status(400).json({ error: 'Missing item name in query parameter.' });
+  }
+
+  if (!store){
+    return res.status(400).json({ error: 'Missing store name in query parameter.' });
+  }
+
+  const serpApiKey = process.env.NODE_ENV_SERP_KEY;
+  let tbs_store = "mr:1,merchagg:";
+
+  if(store == 'H-E-B'){
+    tbs_store += "m122214550";
+  }
+  else if(store == 'Target'){
+    tbs_store += 'g784994%7Cm10046';
+  }
+  else if(store == 'Kroger'){
+    tbs_store += "g126652263%7Cm117989436";
+  }
+  else if(store == 'Walmart'){
+    tbs_store += "g8299768%7Cm8175035";
+  }
+  else{ 
+    tbs_store += "g8299768%7Cm8175035";
+  }
+  getJson({
+    engine: "google",
+    api_key: serpApiKey,
+    tbm: "shop",
+    tbs: tbs_store,
+    q: item,
+    num: 1,
+    location: 'College Station, Texas',
+  }, (data) => {
+    const shoppingResults = data["shopping_results"];
+
+    if (shoppingResults && Array.isArray(shoppingResults) && shoppingResults.length > 0) {
+      const simplifiedResults = {
+        title: shoppingResults[0].title,
+        source: shoppingResults[0].source,
+        thumbnail: shoppingResults[0].thumbnail,
+        price: shoppingResults[0].price,
+      };
+
+      res.json(simplifiedResults);
+    } else {
+      res.status(500).json({ error: "No valid shopping results found in the JSON response." });
+    }
+  });
+});
+
 app.post('/ask', async (req, res) => {
   try {
     if (!req.body || !req.body.prompt) {
