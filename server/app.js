@@ -69,18 +69,41 @@ app.get('/shopping-results-store', (req, res) => {
     tbs_store += "m122214550";
   }
   else if(store == 'Target'){
-
+    tbs_store += 'g784994%7Cm10046';
   }
   else if(store == 'Kroger'){
-
+    tbs_store += "g126652263%7Cm117989436";
   }
   else if(store == 'Walmart'){
-
+    tbs_store += "g8299768%7Cm8175035";
   }
-  else{
-
+  else{ 
+    tbs_store += "g8299768%7Cm8175035";
   }
-  res.status(500).json({ error: "loser" });
+  getJson({
+    engine: "google",
+    api_key: serpApiKey,
+    tbm: "shop",
+    tbs: tbs_store,
+    q: query,
+    num: 11,
+    location: 'College Station, Texas',
+  }, (data) => {
+    const shoppingResults = data["shopping_results"];
+
+    if (shoppingResults && Array.isArray(shoppingResults)) {
+      const simplifiedResults = shoppingResults.map(item => ({
+        title: item.title,
+        source: item.source,
+        thumbnail: item.thumbnail,
+        price: item.price,
+      }));
+
+      res.json(simplifiedResults);
+    } else {
+      res.status(500).json({ error: "No valid shopping results found in the JSON response." });
+    }
+  });
 });
 
 app.post('/ask', async (req, res) => {
