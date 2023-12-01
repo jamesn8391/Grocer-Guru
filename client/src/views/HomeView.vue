@@ -50,7 +50,7 @@ import { toRaw } from 'vue';
     </div>
 
     <div v-if="showModal">
-      <Modal :calibrationResults="shoppingResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
+      <Modal :calibrationResults="calibrationResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
     </div>
 
   </div>
@@ -108,7 +108,9 @@ export default {
           console.log(this.shoppingResults);
 
           // Wait for CalibrateChatGPT to complete before setting isLoading to false
-          //this.calibrationResults = await this.CalibrateChatGPT();
+          this.calibrationResults = await this.CalibrateChatGPT();
+
+          //this.calibrationResults = this.shoppingResults.slice(0,3);
 
           this.isLoading = false;
           this.showModal = true;
@@ -177,6 +179,25 @@ export default {
       return stores;
     },
 
+    findItemByTitle(itemTitle) {
+      // Iterate through each array in the data
+      for (let i = 0; i < this.shoppingResults.length; i++) {
+        const currentArray = this.shoppingResults[i];
+
+        // Iterate through each object in the current array
+        for (let j = 0; j < currentArray.length; j++) {
+          const currentItem = currentArray[j];
+
+          // Check if the title of the current item matches the provided itemTitle
+          if (currentItem.title.toLowerCase().includes(itemTitle.toLowerCase())) {
+            return currentItem;
+          }
+        }
+      }
+
+      return {};
+    },
+
     removeThumbnails(items) {
       let itemsCopy = JSON.parse(JSON.stringify(items));
       for (let i = 0; i < itemsCopy.length; i++) {
@@ -205,18 +226,18 @@ export default {
     async CalibrateChatGPT() {
       try {
         var calibrationResult = []
-
+        var RemovedThumbnailShoppingResults = this.removeThumbnails(this.shoppingResults)
         for (let i = 0; i < 3; i++) {
           var item = this.groceryItems[i];
           var query = "You are a price-conscious buyer and are trying to hunt for the best grocery store deals given a set of data. Given the following JSON, determine the best 3 deals when a customer is requesting " + item + " on their grocery list. Format your response as the JSON with only the top 3 results included. Keep all the JSON data the same. \n";
-          query += JSON.stringify(this.shoppingResults[i]);
+          query += JSON.stringify(RemovedThumbnailShoppingResults[i]);
           console.log(query);
 
           const result = await queryChatGPT(query);
           var JSONstring = result["message"];
-          console.log(calibrationQueryHelper(JSONstring));
+          console.log(calibrationQueryHelper(JSONstring, this.findItemByTitle));
 
-          calibrationResult.push(calibrationQueryHelper(JSONstring));
+          calibrationResult.push(calibrationQueryHelper(JSONstring, this.findItemByTitle));
         }
         return calibrationResult;
 

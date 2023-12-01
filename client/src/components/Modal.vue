@@ -88,7 +88,7 @@ export default {
 
 <style scoped>
 .viewModalBackground {
-    background-color: #ebeff0;
+    background-color: rgba(248,249,250,255);
     border: 2px solid black;
     border-radius: 17px;
     top: 50%;

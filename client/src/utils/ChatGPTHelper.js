@@ -1,11 +1,10 @@
-export function calibrationQueryHelper(JSONstring) {
+export function calibrationQueryHelper(JSONstring, findItemByTitle) {
   const wordsInQuotes = JSONstring.match(/"([^"]*)"/g);
 
   const JSONwords = wordsInQuotes.map((match) => match.slice(1, -1));
 
   var titles = [];
   var sources = [];
-  var thumbnails = [];
   var prices = [];
 
   for (let i = 0; i < JSONwords.length; i++) {
@@ -18,22 +17,23 @@ export function calibrationQueryHelper(JSONstring) {
         sources.push(JSONwords[i + 1]);
         break;
 
-      case "thumbnail":
-        thumbnails.push(JSONwords[i + 1]);
-        break;
-
       case "price":
         prices.push(JSONwords[i + 1]);
         break;
     }
   }
 
-  return titles.map((title, index) => ({
-    title: title,
-    source: sources[index],
-    thumbnail: thumbnails[index],
-    price: prices[index],
-  }));
+  return titles.map((title, index) => {
+    const curItem = findItemByTitle(title);
+  
+    return {
+      title: title,
+      source: curItem ? curItem.source : null,
+      thumbnail: curItem ? curItem.thumbnail : null,
+      price: curItem ? curItem.price : null,
+    };
+  });
+  
 }
 
 
