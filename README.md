@@ -1,6 +1,6 @@
 # Grocer-Guru
 ## Project Description
-this project is a grocery store recommender. We primarily used Vue, as well as API calls to ChatGPT and SerpAPI.
+This project is a grocery store recommender. We primarily used Vue, as well as API calls to ChatGPT and SerpAPI.
 The first thing that a user would do is enter their grocery list onto the website.
 Once the user finishes entering their items, and selects the "Find best Price" button.
 From there, we call SerpAPI, and 11 options for each item in the grocery list is searched and stored.
