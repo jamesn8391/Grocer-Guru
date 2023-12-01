@@ -11,6 +11,7 @@ After the store is decided, it will give a list of the groceries they should buy
 ## Getting Started
 On Server Side
 >node app.js
+
 On Client side
 >npm run dev
 ## Authors
