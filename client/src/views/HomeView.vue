@@ -15,8 +15,11 @@ import { toRaw } from 'vue';
           <h1 class="h1">
             Welcome to Grocer Guru!<br>Get started by adding items.
           </h1>
-          <button @click="toggleGroceryList" class="btn btn-secondary mt-3">
+          <button v-if="showAddGroceries" @click="toggleGroceryList" class="btn btn-secondary mt-3">
             Add Grocery List
+          </button>
+          <button v-else @click="restartApplication" class="btn btn-success mt-3">
+            Try Again!
           </button>
         </div>
       </div>
@@ -34,10 +37,11 @@ import { toRaw } from 'vue';
       <div v-if="isLoading" class="spinner-border mt-5" role="status">
       </div>
     </div>
-    <div v-if="showFinalResults" class="row mt-5 justify-content-center">
-      <div v-for="result in finalResults" class="row">
+    <div v-if="showFinalResults" class="row mt-3 justify-content-center text-center">
+      <h1 class="h1"> Your Recommended Items:</h1>
+      <div v-for="result in finalResults" class="col">
         <div class="item-container">
-          <img :src="result.thumbnail" width="100%" class="d-block result-image w-100">
+          <img :src="result.thumbnail" class="d-block mt-3 result-image w-75">
           <h5>{{ result.title }}</h5>
           <h5>{{ result.price }}</h5>
           <h5>{{ result.source }}</h5>
@@ -61,6 +65,7 @@ export default {
   data() {
     return {
       isLoading: false,
+      showAddGroceries: true,
       showGroceryList: false,
       showModal: false,
       showFinalResults: false,
@@ -70,7 +75,7 @@ export default {
       calibrationResults: [],
       selectedItems: [],
       finalResults: [],
-      
+
     };
   },
   methods: {
@@ -139,7 +144,8 @@ export default {
       this.showFinalResults = true;
       this.showGroceryList = false;
       this.isLoading = false;
-      
+      this.showAddGroceries = false;
+
 
     },
 
@@ -181,13 +187,13 @@ export default {
       return itemsCopy
     },
 
-    getShoppingInfoFromName(names){
+    getShoppingInfoFromName(names) {
       let shoppingResultsArray = [];
-      for(let i = 0; i < names.length; i++){
-        for(let itemIndex = 0; itemIndex < this.shoppingResults.length; itemIndex++){
-          for(let insideIndex = 0; insideIndex < this.shoppingResults[itemIndex].length; insideIndex++){
+      for (let i = 0; i < names.length; i++) {
+        for (let itemIndex = 0; itemIndex < this.shoppingResults.length; itemIndex++) {
+          for (let insideIndex = 0; insideIndex < this.shoppingResults[itemIndex].length; insideIndex++) {
             console.log("name" + this.shoppingResults[itemIndex][insideIndex]);
-            if(this.shoppingResults[itemIndex][insideIndex].title === names[i]){
+            if (this.shoppingResults[itemIndex][insideIndex].title === names[i]) {
               shoppingResultsArray.push(this.shoppingResults[itemIndex][insideIndex])
             }
           }
@@ -221,6 +227,10 @@ export default {
       }
     },
 
+    restartApplication() {
+      location.reload();
+    },
+
   },
 };
 </script>
@@ -244,14 +254,19 @@ export default {
 }
 
 .result-image {
-    border: 2px solid black;
-    border-radius: 12px;
+  border: 2px solid black;
+  border-radius: 12px;
+  height: 25%;
+  margin: auto;
 }
 
 .item-container {
-    margin: auto;
-    text-align: center;
-    width: 25vw;
+  margin: auto;
+  text-align: center;
+  width: 25vw;
 }
 
+.restart-button {
+  width: 8%;
+}
 </style>
