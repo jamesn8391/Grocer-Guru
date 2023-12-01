@@ -85,19 +85,19 @@ app.get('/shopping-results-store', (req, res) => {
     api_key: serpApiKey,
     tbm: "shop",
     tbs: tbs_store,
-    q: query,
-    num: 11,
+    q: item,
+    num: 1,
     location: 'College Station, Texas',
   }, (data) => {
     const shoppingResults = data["shopping_results"];
 
-    if (shoppingResults && Array.isArray(shoppingResults)) {
-      const simplifiedResults = shoppingResults.map(item => ({
-        title: item.title,
-        source: item.source,
-        thumbnail: item.thumbnail,
-        price: item.price,
-      }));
+    if (shoppingResults && Array.isArray(shoppingResults) && shoppingResults.length > 0) {
+      const simplifiedResults = {
+        title: shoppingResults[0].title,
+        source: shoppingResults[0].source,
+        thumbnail: shoppingResults[0].thumbnail,
+        price: shoppingResults[0].price,
+      };
 
       res.json(simplifiedResults);
     } else {
