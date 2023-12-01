@@ -19,7 +19,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-5">
                                         <!-- <div>Selected: {{ selectedItems[resultIndex] }}</div> -->
-                                        <select class="form-select form-select-md" v-model="myArray[resultIndex]">
+                                        <select class="form-select form-select-md" v-model="selectedItems[resultIndex]">
                                             <option disabled value="">Please select one</option>
                                             <option>{{ result[0].title }}</option>
                                             <option>{{ result[1].title }}</option>
@@ -53,12 +53,15 @@
 export default {
     data() {
         return {
-            myArray: [],
             arrayMaxLength: 3, // Set the maximum length for your array
         };
     },
     props: {
         calibrationResults: {
+            type: Array,
+            required: true,
+        },
+        selectedItems: {
             type: Array,
             required: true,
         },
@@ -77,7 +80,7 @@ export default {
     },
     computed: {
         computeAllSelect() {
-            return this.myArray.length === this.arrayMaxLength;
+            return this.selectedItems.length === this.arrayMaxLength;
         },
     },
 }

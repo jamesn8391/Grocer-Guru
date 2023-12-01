@@ -1,5 +1,6 @@
 <script setup>
 import Modal from '../components/Modal.vue';
+import { toRaw } from 'vue';
 
 </script>
 
@@ -101,36 +102,55 @@ export default {
     },
 
     async finalChatQuery() {
-      console.log("run")
-
-      let remainingResults = this.shoppingResults.slice();
-      remainingResults.splice(0, 3);
-
-      var query = "A user chose these three items: " + this.selectedItems.join(' ') + "with these prices " + this.findItemPrice(this.selectedItems).join(' ') + " from these stores" + this.findItemStore(this.selectedItems).join(' ') + " Given this JSON filled with different options of Groceries for different items. Find the best deal for each Grocery Item. Return the data as a JSON with only one item for each grocery.\n " + JSON.stringify(this.shoppingResults.slice(3)) + "provide the name of the store that they should go based on their previous selections. \n";
+      var remainingResults = this.shoppingResults.slice(3); 
+      remainingResults = this.removeThumbnails(remainingResults);
+      var query = "A user chose these three items: " + this.selectedItems.join('; ') + ". With the following prices: " + this.findItemPrice(this.selectedItems).join('; ') + ". And from these stores: " + this.findItemStore(this.selectedItems).join('; ') + ".";
+      query += "\n\n Given this information, recommend the single best deal for each of the following JSONS. Return the information in a JSON format that only includes the best deal for each item from the data below." 
+      for(let resultIndex = 0; resultIndex < remainingResults.length; resultIndex++){
+        query += "\n\n" + this.groceryItems[resultIndex+3] + ": " + JSON.stringify(remainingResults[resultIndex]);
+      }
       console.log(query);
       console.log(query.length);
       const result = await queryChatGPT(query);
       console.log(result["message"]);
     },
 
-    findItemPrice(item) {
+    findItemPrice(items) {
       var prices = []
-      for (let i = 0; i < this.shoppingResults.length; i++) {
-        if (this.shoppingResults[i].title === item) {
-          prices.push(this.shoppingResults[i].price);
+      for(let itemIndex = 0; itemIndex < items.length; itemIndex++){
+        for (let i = 0; i < this.shoppingResults.length; i++) {
+          for(let objectIndex = 0; objectIndex < this.shoppingResults[i].length; objectIndex++){
+            if (this.shoppingResults[i][objectIndex].title === items[itemIndex]) {
+              prices.push(this.shoppingResults[i][objectIndex].price);
+            }
+          }
         }
       }
       return prices;
     },
 
-    findItemStore(item) {
+    findItemStore(items) {
       var stores = []
-      for (let i = 0; i < this.shoppingResults.length; i++) {
-        if (this.shoppingResults[i].source === item) {
-          stores.push(this.shoppingResults[i].price);
+      for(let itemIndex = 0; itemIndex < items.length; itemIndex++){
+        for (let i = 0; i < this.shoppingResults.length; i++) {
+          for(let objectIndex = 0; objectIndex < this.shoppingResults[i].length; objectIndex++){
+            if (this.shoppingResults[i][objectIndex].title === items[itemIndex]) {
+              stores.push(this.shoppingResults[i][objectIndex].source);
+            }
+          }
         }
       }
       return stores;
+    },
+
+    removeThumbnails(items) {
+      let itemsCopy = JSON.parse(JSON.stringify(items));
+      for (let i = 0; i < itemsCopy.length; i++) {
+          for(let objectIndex = 0; objectIndex < itemsCopy[i].length; objectIndex++){
+            delete itemsCopy[i][objectIndex].thumbnail
+          }
+        }
+      return itemsCopy
     },
 
     async CalibrateChatGPT() {
