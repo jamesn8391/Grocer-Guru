@@ -50,6 +50,39 @@ app.get('/shopping-results', (req, res) => {
   });
 });
 
+app.get('/shopping-results-store', (req, res) => {
+  const item = req.query.item;
+  const store = req.query.store;
+
+  if (!item) {
+    return res.status(400).json({ error: 'Missing item name in query parameter.' });
+  }
+
+  if (!store){
+    return res.status(400).json({ error: 'Missing store name in query parameter.' });
+  }
+
+  const serpApiKey = process.env.NODE_ENV_SERP_KEY;
+  let tbs_store = "mr:1,merchagg:";
+
+  if(store == 'H-E-B'){
+    tbs_store += "m122214550";
+  }
+  else if(store == 'Target'){
+
+  }
+  else if(store == 'Kroger'){
+
+  }
+  else if(store == 'Walmart'){
+
+  }
+  else{
+
+  }
+  res.status(500).json({ error: "loser" });
+});
+
 app.post('/ask', async (req, res) => {
   try {
     if (!req.body || !req.body.prompt) {
