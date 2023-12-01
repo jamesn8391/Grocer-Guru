@@ -34,6 +34,16 @@ import { toRaw } from 'vue';
       <div v-if="isLoading" class="spinner-border mt-5" role="status">
       </div>
     </div>
+    <div v-if="showFinalResults" class="row mt-5 justify-content-center">
+      <div v-for="result in finalResults" class="row">
+        <div class="item-container">
+          <img :src="result.thumbnail" width="100%" class="d-block result-image w-100">
+          <h5>{{ result.title }}</h5>
+          <h5>{{ result.price }}</h5>
+          <h5>{{ result.source }}</h5>
+        </div>
+      </div>
+    </div>
 
     <div v-if="showModal">
       <Modal :calibrationResults="shoppingResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
@@ -45,7 +55,7 @@ import { toRaw } from 'vue';
 <script>
 import { fetchShoppingResults } from '../services/ShoppingService';
 import { queryChatGPT } from '../services/ChatGPTService';
-import { calibrationQueryHelper } from '../utils/CalibrationResponseHelper'
+import { calibrationQueryHelper, finalQueryHelper } from '../utils/ChatGPTHelper'
 
 export default {
   data() {
@@ -53,11 +63,14 @@ export default {
       isLoading: false,
       showGroceryList: false,
       showModal: false,
+      showFinalResults: false,
       searchBars: [],
       groceryItems: [],
       shoppingResults: [],
       calibrationResults: [],
       selectedItems: [],
+      finalResults: [],
+      
     };
   },
   methods: {
@@ -93,7 +106,7 @@ export default {
           //this.calibrationResults = await this.CalibrateChatGPT();
 
           this.isLoading = false;
-          this.showModal = true; // fix this when merging
+          this.showModal = true;
         })
         .catch(error => {
           this.isLoading = false;
@@ -102,24 +115,39 @@ export default {
     },
 
     async finalChatQuery() {
-      var remainingResults = this.shoppingResults.slice(3); 
+      var shoppingResultsCopy = JSON.parse(JSON.stringify(this.shoppingResults));
+      var remainingResults = shoppingResultsCopy.slice(3);
       remainingResults = this.removeThumbnails(remainingResults);
+      console.log(this.shoppingResults)
       var query = "A user chose these three items: " + this.selectedItems.join('; ') + ". With the following prices: " + this.findItemPrice(this.selectedItems).join('; ') + ". And from these stores: " + this.findItemStore(this.selectedItems).join('; ') + ".";
-      query += "\n\n Given this information, recommend the single best deal for each of the following JSONS. Return the information in a JSON format that only includes the best deal for each item from the data below." 
-      for(let resultIndex = 0; resultIndex < remainingResults.length; resultIndex++){
-        query += "\n\n" + this.groceryItems[resultIndex+3] + ": " + JSON.stringify(remainingResults[resultIndex]);
+      query += "\n\n Given this information, recommend the single best deal for each of the following JSONS. Return the information in a JSON format that only includes the best deal for each item from the data below."
+      for (let resultIndex = 0; resultIndex < remainingResults.length; resultIndex++) {
+        query += "\n\n" + this.groceryItems[resultIndex + 3] + ": " + JSON.stringify(remainingResults[resultIndex]);
       }
       console.log(query);
       console.log(query.length);
+      this.showModal = false;
+      this.isLoading = true;
       const result = await queryChatGPT(query);
-      console.log(result["message"]);
+
+      var finalNames = this.selectedItems.concat(finalQueryHelper(result["message"]));
+
+      let shoppingNames = this.getShoppingInfoFromName(finalNames);
+      this.finalResults = new Set(shoppingNames);
+      console.log(this.finalResults)
+
+      this.showFinalResults = true;
+      this.showGroceryList = false;
+      this.isLoading = false;
+      
+
     },
 
     findItemPrice(items) {
       var prices = []
-      for(let itemIndex = 0; itemIndex < items.length; itemIndex++){
+      for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
         for (let i = 0; i < this.shoppingResults.length; i++) {
-          for(let objectIndex = 0; objectIndex < this.shoppingResults[i].length; objectIndex++){
+          for (let objectIndex = 0; objectIndex < this.shoppingResults[i].length; objectIndex++) {
             if (this.shoppingResults[i][objectIndex].title === items[itemIndex]) {
               prices.push(this.shoppingResults[i][objectIndex].price);
             }
@@ -131,9 +159,9 @@ export default {
 
     findItemStore(items) {
       var stores = []
-      for(let itemIndex = 0; itemIndex < items.length; itemIndex++){
+      for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
         for (let i = 0; i < this.shoppingResults.length; i++) {
-          for(let objectIndex = 0; objectIndex < this.shoppingResults[i].length; objectIndex++){
+          for (let objectIndex = 0; objectIndex < this.shoppingResults[i].length; objectIndex++) {
             if (this.shoppingResults[i][objectIndex].title === items[itemIndex]) {
               stores.push(this.shoppingResults[i][objectIndex].source);
             }
@@ -146,11 +174,26 @@ export default {
     removeThumbnails(items) {
       let itemsCopy = JSON.parse(JSON.stringify(items));
       for (let i = 0; i < itemsCopy.length; i++) {
-          for(let objectIndex = 0; objectIndex < itemsCopy[i].length; objectIndex++){
-            delete itemsCopy[i][objectIndex].thumbnail
+        for (let objectIndex = 0; objectIndex < itemsCopy[i].length; objectIndex++) {
+          delete itemsCopy[i][objectIndex].thumbnail
+        }
+      }
+      return itemsCopy
+    },
+
+    getShoppingInfoFromName(names){
+      let shoppingResultsArray = [];
+      for(let i = 0; i < names.length; i++){
+        for(let itemIndex = 0; itemIndex < this.shoppingResults.length; itemIndex++){
+          for(let insideIndex = 0; insideIndex < this.shoppingResults[itemIndex].length; insideIndex++){
+            console.log("name" + this.shoppingResults[itemIndex][insideIndex]);
+            if(this.shoppingResults[itemIndex][insideIndex].title === names[i]){
+              shoppingResultsArray.push(this.shoppingResults[itemIndex][insideIndex])
+            }
           }
         }
-      return itemsCopy
+      }
+      return shoppingResultsArray
     },
 
     async CalibrateChatGPT() {
@@ -199,4 +242,16 @@ export default {
 .btn {
   margin-right: 10px;
 }
+
+.result-image {
+    border: 2px solid black;
+    border-radius: 12px;
+}
+
+.item-container {
+    margin: auto;
+    text-align: center;
+    width: 25vw;
+}
+
 </style>

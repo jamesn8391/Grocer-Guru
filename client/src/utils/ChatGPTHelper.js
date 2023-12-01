@@ -35,3 +35,22 @@ export function calibrationQueryHelper(JSONstring) {
     price: prices[index],
   }));
 }
+
+
+export function finalQueryHelper(JSONstring) {
+  const wordsInQuotes = JSONstring.match(/"([^"]*)"/g);
+
+  const JSONwords = wordsInQuotes.map((match) => match.slice(1, -1));
+
+  var titles = [];
+
+  for (let i = 0; i < JSONwords.length; i++) {
+    switch (JSONwords[i]) {
+      case "title":
+        titles.push(JSONwords[i + 1]);
+        break;
+    }
+  }
+
+  return titles;
+}
