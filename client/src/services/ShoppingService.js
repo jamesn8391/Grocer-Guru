@@ -17,7 +17,7 @@ export async function fetchShoppingResults(query) {
 export async function fetchFinalShoppingResults(item, store) {
   try {
     const response = await axios.get("/shopping-results-store", { params: { item: item, store: store} });
-    //console.log('Shopping Results:', response.data);
+    console.log('Shopping Results:', response.data);
     return response.data;
   } catch (error) {
     error = error.response
