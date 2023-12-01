@@ -48,7 +48,10 @@ import { toRaw } from 'vue';
         </div>
       </div>
     </div>
-
+    <div v-if="showFinalResults" class="row mt-3 justify-content-center text-center">
+      <h1 class="h1"> Your Recommended Store: {{ finalStore }}</h1>
+      <h2> Your Grocery Store Items from {{ finalStore }}</h2>
+    </div>
     <div v-if="showModal">
       <Modal :calibrationResults="calibrationResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
     </div>
@@ -59,7 +62,7 @@ import { toRaw } from 'vue';
 <script>
 import { fetchShoppingResults } from '../services/ShoppingService';
 import { queryChatGPT } from '../services/ChatGPTService';
-import { calibrationQueryHelper, finalQueryHelper } from '../utils/ChatGPTHelper'
+import { calibrationQueryHelper, finalQueryHelper, storeRecommenderHelper } from '../utils/ChatGPTHelper'
 
 export default {
   data() {
@@ -75,6 +78,7 @@ export default {
       calibrationResults: [],
       selectedItems: [],
       finalResults: [],
+      finalStore: "",
 
     };
   },
@@ -142,6 +146,8 @@ export default {
       let shoppingNames = this.getShoppingInfoFromName(finalNames);
       this.finalResults = new Set(shoppingNames);
       console.log(this.finalResults)
+      
+      this.finalStore = await this.ChatGPTStoreRecommender();
 
       this.showFinalResults = true;
       this.showGroceryList = false;
@@ -240,6 +246,25 @@ export default {
           calibrationResult.push(calibrationQueryHelper(JSONstring, this.findItemByTitle));
         }
         return calibrationResult;
+
+      } catch (error) {
+        console.error(error);
+        console.log(this.shoppingResults.map(innerList => innerList.slice(0, 3)));
+        return { "error": "loser" };
+      }
+    },
+    async ChatGPTStoreRecommender() {
+      try {
+
+        var query = "What store would you recommend based on the provided JSON below? Return your response as a JSON with 'store' as the key for your recommendation. \n\n";
+        query += JSON.stringify(this.finalResults);
+        console.log(query);
+
+        const result = await queryChatGPT(query);
+        var JSONstring = result["message"];
+        console.log(storeRecommenderHelper(JSONstring));
+
+        return storeRecommenderHelper(JSONstring);
 
       } catch (error) {
         console.error(error);
