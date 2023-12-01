@@ -50,7 +50,14 @@ import { toRaw } from 'vue';
     </div>
     <div v-if="showFinalResults" class="row mt-3 justify-content-center text-center">
       <h1 class="h1"> Your Recommended Store: {{ finalStore }}</h1>
-      <h2> Your Grocery Store Items from {{ finalStore }}</h2>
+      <div v-for="result in finalStoreItems" class="col">
+        <div class="item-container">
+          <img :src="result.thumbnail" class="d-block mt-3 result-image w-75">
+          <h5>{{ result.title }}</h5>
+          <h5>{{ result.price }}</h5>
+          <h5>{{ result.source }}</h5>
+        </div>
+      </div>
     </div>
     <div v-if="showModal">
       <Modal :calibrationResults="calibrationResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
@@ -60,7 +67,7 @@ import { toRaw } from 'vue';
 </template>
 
 <script>
-import { fetchShoppingResults } from '../services/ShoppingService';
+import { fetchShoppingResults, fetchFinalShoppingResults } from '../services/ShoppingService';
 import { queryChatGPT } from '../services/ChatGPTService';
 import { calibrationQueryHelper, finalQueryHelper, storeRecommenderHelper } from '../utils/ChatGPTHelper'
 
@@ -79,6 +86,7 @@ export default {
       selectedItems: [],
       finalResults: [],
       finalStore: "",
+      finalStoreItems: [],
 
     };
   },
@@ -112,9 +120,9 @@ export default {
           console.log(this.shoppingResults);
 
           // Wait for CalibrateChatGPT to complete before setting isLoading to false
-          this.calibrationResults = await this.CalibrateChatGPT();
+          //this.calibrationResults = await this.CalibrateChatGPT();
 
-          //this.calibrationResults = this.shoppingResults.slice(0,3);
+          this.calibrationResults = this.shoppingResults.slice(0,3);
 
           this.isLoading = false;
           this.showModal = true;
@@ -148,6 +156,7 @@ export default {
       console.log(this.finalResults)
       
       this.finalStore = await this.ChatGPTStoreRecommender();
+      this.finalSearch();
 
       this.showFinalResults = true;
       this.showGroceryList = false;
@@ -257,7 +266,7 @@ export default {
       try {
 
         var query = "What store would you recommend based on the provided JSON below? Return your response as a JSON with 'store' as the key for your recommendation. \n\n";
-        query += JSON.stringify(this.finalResults);
+        query += JSON.stringify(Array.from(this.finalResults));
         console.log(query);
 
         const result = await queryChatGPT(query);
@@ -271,6 +280,24 @@ export default {
         console.log(this.shoppingResults.map(innerList => innerList.slice(0, 3)));
         return { "error": "loser" };
       }
+    },
+
+    finalSearch() {
+
+      var items = Array.from(this.finalResults).map(result => result.title);
+
+      Promise.all(
+        items.map(item => fetchFinalShoppingResults(item))
+      )
+        .then(async results => {
+          this.finalStoreItems = results;
+          console.log(this.finalStoreItems);
+
+        })
+        .catch(error => {
+          this.isLoading = false;
+          console.error('Error:', error);
+        });
     },
 
     restartApplication() {
