@@ -17,9 +17,8 @@ app.get('/', function (req, res) {
 
 app.get('/shopping-results', (req, res) => {
   const query = req.query.q;
-
   if (!query) {
-    return res.status(400).json({ error: 'Missing query parameter.' });
+    return res.status(400).json({ error: 'Missing search query parameter.' });
   }
 
   const serpApiKey = process.env.NODE_ENV_SERP_KEY;
@@ -30,7 +29,6 @@ app.get('/shopping-results', (req, res) => {
     tbm: "shop",
     tbs: "mr:1,merchagg:g784994%7Cm10046|m122214550|g8299768%7Cm8175035|g126652263%7Cm117989436",
     q: query,
-    num: 11,
     location: 'College Station, Texas',
   }, (data) => {
     const shoppingResults = data["shopping_results"];
@@ -86,7 +84,7 @@ app.get('/shopping-results-store', (req, res) => {
     tbm: "shop",
     tbs: tbs_store,
     q: item,
-    num: 1,
+    num: 11,
     location: 'College Station, Texas',
   }, (data) => {
     const shoppingResults = data["shopping_results"];

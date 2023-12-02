@@ -12,8 +12,11 @@ import { toRaw } from 'vue';
       </div>
       <div class="col">
         <div class="container mt-5 pt-5 text-center">
-          <h1 class="h1">
+          <h1 v-if="showAddGroceries" class="h1">
             Welcome to Grocer Guru!<br>Get started by adding items.
+          </h1>
+          <h1 v-else class="h1">
+            Welcome to Grocer Guru!
           </h1>
           <button v-if="showAddGroceries" @click="toggleGroceryList" class="btn btn-secondary mt-3">
             Add Grocery List
@@ -24,8 +27,9 @@ import { toRaw } from 'vue';
         </div>
       </div>
     </div>
+    <hr v-if="(showGroceryList && !isLoading) || showFinalResults" class="hr py-1 mt-5" />
     <div class="row justify-content-center">
-      <div v-if="showGroceryList && !isLoading" class="col-5 mt-3 pt-5 text-center">
+      <div v-if="showGroceryList && !isLoading" class="col-5 mt-3 text-center">
         <h2 class="h2"> Your Grocery List:</h2>
         <div v-for="(searchBar, index) in searchBars" :key="index" class="form-outline my-4">
           <input ref="inputFields" v-model="groceryItems[index]" type="search" :id="'form' + index" class="form-control"
@@ -37,10 +41,10 @@ import { toRaw } from 'vue';
       <div v-if="isLoading" class="spinner-border mt-5" role="status">
       </div>
     </div>
-    <div v-if="showFinalResults" class="row mt-3 justify-content-center text-center">
+    <div v-if="showFinalResults" class="row mt-3 justify-content-center align-items-center text-center">
       <h1 class="h1"> Your Recommended Items:</h1>
       <div v-for="result in finalResults" class="col">
-        <div class="item-container">
+        <div class="item-container align-items-center">
           <img :src="result.thumbnail" class="d-block mt-3 result-image w-75">
           <h5>{{ result.title }}</h5>
           <h5>{{ result.price }}</h5>
@@ -48,7 +52,19 @@ import { toRaw } from 'vue';
         </div>
       </div>
     </div>
-
+    <hr v-if="showFinalResults" class="hr py-2 mt-3" />
+    <div v-if="showFinalResults" class="row mt-3 justify-content-center align-items-center text-center">
+      <h1 class="h1"> Your Recommended Store: {{ finalStore }}</h1>
+      <div v-for="result in finalStoreItems" class="col">
+        <div class="item-container align-items-center">
+          <img :src="result.thumbnail" class="d-block mt-3 result-image w-75">
+          <h5>{{ result.title }}</h5>
+          <h5>{{ result.price }}</h5>
+          <h5>{{ result.source }}</h5>
+        </div>
+      </div>
+      <h1 class="h1"> Final Price: {{ this.finalPrice.toFixed(2) }}</h1>
+    </div>
     <div v-if="showModal">
       <Modal :calibrationResults="calibrationResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
     </div>
@@ -57,9 +73,9 @@ import { toRaw } from 'vue';
 </template>
 
 <script>
-import { fetchShoppingResults } from '../services/ShoppingService';
+import { fetchShoppingResults, fetchFinalShoppingResults } from '../services/ShoppingService';
 import { queryChatGPT } from '../services/ChatGPTService';
-import { calibrationQueryHelper, finalQueryHelper } from '../utils/ChatGPTHelper'
+import { calibrationQueryHelper, finalQueryHelper, storeRecommenderHelper } from '../utils/ChatGPTHelper'
 
 export default {
   data() {
@@ -75,6 +91,9 @@ export default {
       calibrationResults: [],
       selectedItems: [],
       finalResults: [],
+      finalStore: "",
+      finalStoreItems: [],
+      finalPrice: 0.00,
 
     };
   },
@@ -108,9 +127,9 @@ export default {
           console.log(this.shoppingResults);
 
           // Wait for CalibrateChatGPT to complete before setting isLoading to false
-          this.calibrationResults = await this.CalibrateChatGPT();
+          //this.calibrationResults = await this.CalibrateChatGPT();
 
-          //this.calibrationResults = this.shoppingResults.slice(0,3);
+          this.calibrationResults = this.shoppingResults.slice(0, 3);
 
           this.isLoading = false;
           this.showModal = true;
@@ -143,11 +162,8 @@ export default {
       this.finalResults = new Set(shoppingNames);
       console.log(this.finalResults)
 
-      this.showFinalResults = true;
-      this.showGroceryList = false;
-      this.isLoading = false;
-      this.showAddGroceries = false;
-
+      this.finalStore = await this.ChatGPTStoreRecommender();
+      this.finalSearch();
 
     },
 
@@ -246,6 +262,56 @@ export default {
         console.log(this.shoppingResults.map(innerList => innerList.slice(0, 3)));
         return { "error": "loser" };
       }
+    },
+    async ChatGPTStoreRecommender() {
+      try {
+
+        var query = "What store would you recommend based on the provided JSON below? Return your response as a JSON with 'store' as the key for your recommendation. \n\n";
+        query += JSON.stringify(Array.from(this.finalResults));
+        console.log(query);
+
+        const result = await queryChatGPT(query);
+        var JSONstring = result["message"];
+        console.log(storeRecommenderHelper(JSONstring));
+
+        return storeRecommenderHelper(JSONstring);
+
+      } catch (error) {
+        console.error(error);
+        console.log(this.shoppingResults.map(innerList => innerList.slice(0, 3)));
+        return { "error": "loser" };
+      }
+    },
+
+    finalSearch() {
+
+      var items = Array.from(this.finalResults).map(result => result.title);
+
+      console.log(items)
+      Promise.all(
+        items.map((item, index) => (this.findItemStore(Array(item))[0].indexOf(this.finalStore) ? fetchFinalShoppingResults(this.groceryItems[index], this.finalStore) : this.findItemByTitle(item)))
+      )
+        .then(async results => {
+          this.finalStoreItems = results;
+          console.log(this.finalStoreItems);
+
+          this.finalPrice = 0.00;
+
+          this.finalStoreItems.forEach(product => {
+            const price = parseFloat(product.price.replace("$", ""));
+            this.finalPrice += price;
+          });
+
+          this.showFinalResults = true;
+          this.showGroceryList = false;
+          this.isLoading = false;
+          this.showAddGroceries = false;
+
+        })
+        .catch(error => {
+          this.isLoading = false;
+          console.error('Error:', error);
+        });
     },
 
     restartApplication() {

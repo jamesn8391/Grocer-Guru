@@ -8,7 +8,7 @@ export function calibrationQueryHelper(JSONstring, findItemByTitle) {
   var prices = [];
 
   for (let i = 0; i < JSONwords.length; i++) {
-    switch (JSONwords[i]) {
+    switch (JSONwords[i].toLowerCase()) {
       case "title":
         titles.push(JSONwords[i + 1]);
         break;
@@ -45,7 +45,7 @@ export function finalQueryHelper(JSONstring) {
   var titles = [];
 
   for (let i = 0; i < JSONwords.length; i++) {
-    switch (JSONwords[i]) {
+    switch (JSONwords[i].toLowerCase()) {
       case "title":
         titles.push(JSONwords[i + 1]);
         break;
@@ -53,4 +53,19 @@ export function finalQueryHelper(JSONstring) {
   }
 
   return titles;
+}
+
+export function storeRecommenderHelper(JSONstring) {
+  const wordsInQuotes = JSONstring.match(/"([^"]*)"/g);
+
+  const JSONwords = wordsInQuotes.map((match) => match.slice(1, -1));
+
+  for (let i = 0; i < JSONwords.length; i++) {
+    switch (JSONwords[i].toLowerCase()) {
+      case "store":
+        return JSONwords[i + 1];
+    }
+  }
+
+  return "Walmart";
 }

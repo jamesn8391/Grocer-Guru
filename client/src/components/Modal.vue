@@ -100,7 +100,7 @@ export default {
     text-align: center;
     margin: auto;
     width: 75vw;
-    height: 70vh;
+    min-height: 70vh;
 }
 
 h5 {
@@ -114,7 +114,7 @@ img {
 
 .item-container {
     width: 15vw;
-    height: 47vh;
+    min-height: 47vh;
     margin: auto;
 }
 
