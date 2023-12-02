@@ -29,6 +29,7 @@ app.get('/shopping-results', (req, res) => {
     tbm: "shop",
     tbs: "mr:1,merchagg:g784994%7Cm10046|m122214550|g8299768%7Cm8175035|g126652263%7Cm117989436",
     q: query,
+    num: 11,
     location: 'College Station, Texas',
   }, (data) => {
     const shoppingResults = data["shopping_results"];

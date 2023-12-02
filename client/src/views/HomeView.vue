@@ -63,7 +63,7 @@ import { toRaw } from 'vue';
           <h5>{{ result.source }}</h5>
         </div>
       </div>
-      <h1 class="h1"> Final Price: {{ this.finalPrice.toFixed(2) }}</h1>
+      <h1 class="h1"> Final Price: ${{ this.finalPrice.toFixed(2) }}</h1>
     </div>
     <div v-if="showModal">
       <Modal :calibrationResults="calibrationResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
@@ -127,9 +127,9 @@ export default {
           console.log(this.shoppingResults);
 
           // Wait for CalibrateChatGPT to complete before setting isLoading to false
-          //this.calibrationResults = await this.CalibrateChatGPT();
+          this.calibrationResults = await this.CalibrateChatGPT();
 
-          this.calibrationResults = this.shoppingResults.slice(0, 3);
+          //this.calibrationResults = this.shoppingResults.slice(0, 3);
 
           this.isLoading = false;
           this.showModal = true;
