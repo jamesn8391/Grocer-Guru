@@ -63,6 +63,7 @@ import { toRaw } from 'vue';
           <h5>{{ result.source }}</h5>
         </div>
       </div>
+      <h1 class="h1"> Final Price: {{ this.finalPrice.toFixed(2) }}</h1>
     </div>
     <div v-if="showModal">
       <Modal :calibrationResults="calibrationResults" :selectedItems="selectedItems" :finalChatQuery="finalChatQuery" />
@@ -92,6 +93,7 @@ export default {
       finalResults: [],
       finalStore: "",
       finalStoreItems: [],
+      finalPrice: 0.00,
 
     };
   },
@@ -292,6 +294,13 @@ export default {
         .then(async results => {
           this.finalStoreItems = results;
           console.log(this.finalStoreItems);
+
+          this.finalPrice = 0.00;
+
+          this.finalStoreItems.forEach(product => {
+            const price = parseFloat(product.price.replace("$", ""));
+            this.finalPrice += price;
+          });
 
           this.showFinalResults = true;
           this.showGroceryList = false;
