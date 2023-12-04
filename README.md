@@ -19,3 +19,7 @@ On Client Side
 ```
 Sohaib Raja, Jaden Reyes, James Nolan, Emil Agbigay
 ```
+
+## Video Links
+Shorter: https://youtu.be/MauLV1mEcAw
+Longer/Full: https://youtu.be/nEHzFVQPG0o
